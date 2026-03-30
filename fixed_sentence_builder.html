@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Construye tu frase con la sheriff Victoria</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Georgia, serif;
+  background: #1f1b16;
+  color: #f4e9d8;
+}
+
+.container {
+  display: flex;
+  padding: 40px;
+  gap: 40px;
+}
+
+.left {
+  flex: 1;
+}
+
+.right {
+  width: 320px;
+  position: relative;
+}
+
+h1 {
+  font-size: 42px;
+  margin-bottom: 20px;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 14px;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  background: #a67c52;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #8b5e34;
+}
+
+.sentence-box {
+  background: #f4e9d8;
+  color: #5a3e2b;
+  padding: 20px;
+  border-radius: 15px;
+  min-height: 90px;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.actions {
+  margin-bottom: 20px;
+}
+
+.bank {
+  background: #2c241d;
+  padding: 15px;
+  border-radius: 10px;
+  min-height: 80px;
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 26px;
+  margin: 30px 0 10px;
+}
+
+input {
+  padding: 10px;
+  margin-right: 5px;
+}
+
+.word-list span {
+  display: inline-block;
+  background: #3a3128;
+  padding: 6px 10px;
+  margin: 4px;
+  border-radius: 12px;
+}
+
+.bubble {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  background: #f4e9d8;
+  color: #5a3e2b;
+  padding: 12px;
+  border-radius: 12px;
+  max-width: 220px;
+}
+
+.bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  left: 40px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: #f4e9d8 transparent transparent transparent;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="left">
+
+<h1>Construye tu frase con la sheriff Victoria</h1>
+
+<div class="buttons">
+<button onclick="newWord('subject')">🎲 Sujeto</button>
+<button onclick="newWord('verb')">🎲 Verbo</button>
+<button onclick="newWord('hfw')">🎲 Palabra clave</button>
+<button onclick="newWord('complement')">🎲 Complemento</button>
+</div>
+
+<div class="sentence-box" id="sentence">Todavía no hay frase…</div>
+
+<div class="actions">
+<button onclick="saveSentence()">💾 Guardar frase favorita</button>
+<button onclick="resetSentence()">🔄 Empezar de nuevo</button>
+</div>
+
+<div class="bank" id="bank"></div>
+
+<div class="section-title">Palabras guardadas</div>
+
+<div class="word-list" id="listSubjects"></div>
+<div class="word-list" id="listVerbs"></div>
+<div class="word-list" id="listHfw"></div>
+<div class="word-list" id="listComplements"></div>
+
+<div class="section-title">Añadir palabras</div>
+
+<input id="inputSubject" placeholder="Nuevo sujeto">
+<button onclick="addWord('subject')">Añadir</button><br><br>
+
+<input id="inputVerb" placeholder="Nuevo verbo">
+<button onclick="addWord('verb')">Añadir</button><br><br>
+
+<input id="inputHfw" placeholder="Nueva palabra clave">
+<button onclick="addWord('hfw')">Añadir</button><br><br>
+
+<input id="inputComplement" placeholder="Nuevo complemento">
+<button onclick="addWord('complement')">Añadir</button>
+
+</div>
+
+<div class="right">
+<div class="bubble">A ver, ayudantes… construyamos una frase.</div>
+</div>
+
+</div>
+
+<script>
+let subjects = ["El niño","La maestra","El gato"];
+let verbs = ["come","escribe","compra"];
+let hfws = ["siempre","hoy","aquí"];
+let complements = ["una manzana","en la escuela","por la mañana"];
+
+let current = {subject:"",verb:"",hfw:"",complement:""};
+let saved = [];
+
+function random(arr,currentVal){
+ let options = arr.filter(x=>x!==currentVal);
+ if(options.length===0) return arr[0];
+ return options[Math.floor(Math.random()*options.length)];
+}
+
+function newWord(type){
+ if(type==="subject") current.subject=random(subjects,current.subject);
+ if(type==="verb") current.verb=random(verbs,current.verb);
+ if(type==="hfw") current.hfw=random(hfws,current.hfw);
+ if(type==="complement") current.complement=random(complements,current.complement);
+ updateSentence();
+}
+
+function updateSentence(){
+ let s = `${current.subject} ${current.hfw} ${current.verb} ${current.complement}`.trim();
+ document.getElementById("sentence").innerText = s || "Todavía no hay frase…";
+}
+
+function addWord(type){
+ let val;
+ if(type==="subject") val=inputSubject.value;
+ if(type==="verb") val=inputVerb.value;
+ if(type==="hfw") val=inputHfw.value;
+ if(type==="complement") val=inputComplement.value;
+
+ if(!val) return;
+
+ if(type==="subject") subjects.push(val);
+ if(type==="verb") verbs.push(val);
+ if(type==="hfw") hfws.push(val);
+ if(type==="complement") complements.push(val);
+
+ renderLists();
+}
+
+function saveSentence(){
+ let s=document.getElementById("sentence").innerText;
+ if(!s || s==="Todavía no hay frase…") return;
+ saved.push(s);
+ renderBank();
+}
+
+function renderBank(){
+ document.getElementById("bank").innerHTML=saved.map(s=>"<div>"+s+"</div>").join("");
+}
+
+function renderLists(){
+ listSubjects.innerHTML=subjects.map(s=>"<span>"+s+"</span>").join("");
+ listVerbs.innerHTML=verbs.map(s=>"<span>"+s+"</span>").join("");
+ listHfw.innerHTML=hfws.map(s=>"<span>"+s+"</span>").join("");
+ listComplements.innerHTML=complements.map(s=>"<span>"+s+"</span>").join("");
+}
+
+function resetSentence(){
+ current={subject:"",verb:"",hfw:"",complement:""};
+ updateSentence();
+}
+
+renderLists();
+</script>
+
+</body>
+</html>
